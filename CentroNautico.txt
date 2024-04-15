@@ -1,0 +1,259 @@
+-- Creación de la base de datos
+CREATE DATABASE ClubNautico;
+
+-- Selección de la base de datos
+USE ClubNautico;
+
+-- Creación de las tablas
+CREATE TABLE Socios (
+  cedula INT PRIMARY KEY,
+  nombre VARCHAR(50) NOT NULL,
+  direccion VARCHAR(100) NOT NULL,
+  telefono VARCHAR(20) NOT NULL,
+  fecha_vinculacion DATE NOT NULL
+);
+
+CREATE TABLE Yates (
+  matricula VARCHAR(20) PRIMARY KEY,
+  nombre VARCHAR(50) NOT NULL,
+  tipo VARCHAR(50) NOT NULL,
+  dimensiones VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Zonas (
+letra_zona VARCHAR(1) PRIMARY KEY,
+profundidad FLOAT NOT NULL,
+ancho FLOAT NOT NULL
+);
+
+CREATE TABLE Amarres (
+  numero_amarre INT PRIMARY KEY,
+  lectura_agua FLOAT NOT NULL,
+  lectura_luz FLOAT NOT NULL,
+  fecha_asignacion DATE NOT NULL,
+  fecha_compra DATE NOT NULL,
+  fecha_arriendo DATE NOT NULL,
+  matricula_yate VARCHAR(20) NOT NULL,
+  cedula_socio_propietario INT NOT NULL,
+letra_zona VARCHAR(20) NOT NULL,
+  FOREIGN KEY (matricula_yate) REFERENCES Yates(matricula),
+ FOREIGN KEY (cedula_socio_propietario) REFERENCES Socios(cedula),
+ FOREIGN KEY (letra_zona) REFERENCES Zonas(letra_zona)
+);
+
+
+
+CREATE TABLE Yates_Zonas (
+matricula_yate VARCHAR(20) NOT NULL,
+letra_zona VARCHAR(1) NOT NULL,
+FOREIGN KEY (matricula_yate) REFERENCES Yates(matricula),
+FOREIGN KEY (letra_zona) REFERENCES Zonas(letra_zona),
+PRIMARY KEY (matricula_yate, letra_zona)
+);
+
+CREATE TABLE Empleados (
+cedula_empleado INT PRIMARY KEY,
+nombre VARCHAR(50) NOT NULL,
+fecha_contratacion DATE NOT NULL
+);
+
+CREATE TABLE Yates_Empleados (
+matricula_yate VARCHAR(20) NOT NULL,
+cedula_empleado INT NOT NULL,
+FOREIGN KEY (matricula_yate) REFERENCES Yates(matricula),
+FOREIGN KEY (cedula_empleado) REFERENCES Empleados(cedula_empleado),
+PRIMARY KEY (matricula_yate, cedula_empleado)
+);
+
+CREATE TABLE Socios_Amarres (
+cedula_socio INT NOT NULL,
+numero_amarre INT NOT NULL,
+fecha_compra DATE NOT NULL,
+FOREIGN KEY (cedula_socio) REFERENCES Socios(cedula),
+FOREIGN KEY (numero_amarre) REFERENCES Amarres(numero_amarre),
+PRIMARY KEY (cedula_socio, numero_amarre)
+);
+
+CREATE TABLE Facturas (
+id_factura INT PRIMARY KEY,
+mes DATE NOT NULL,
+monto FLOAT NOT NULL,
+cedula_socio INT NOT NULL,
+estado_pago VARCHAR(20) NOT NULL,
+FOREIGN KEY (cedula_socio) REFERENCES Socios(cedula)
+);
+
+-- Creación de los usuarios
+
+CREATE USER usuariouno IDENTIFIED BY '123';
+CREATE USER usuariodos IDENTIFIED BY '123';
+CREATE USER usuariotres IDENTIFIED BY '123';
+
+-- Asignación de permisos a los usuarios
+
+GRANT ALL ON ClubNautico.* TO usuariouno;
+GRANT SELECT ON ClubNautico.Yates TO usuariodos;
+GRANT SELECT ON ClubNautico.Socios TO usuariodos;
+GRANT UPDATE ON ClubNautico.Facturas TO usuariodos;
+GRANT SELECT ON ClubNautico.Empleados TO usuariotres;
+GRANT SELECT ON ClubNautico.Yates_Empleados TO usuariotres;
+
+INSERT INTO Socios VALUES
+(10, 'Juan Perez', 'Calle 6 bis a, Bogota', '123-456-7890', '2020-01-01'),
+(11, 'Maria Garcia', 'Calle 89, Medellin', '234-567-8901', '2019-05-15'),
+(12, 'Pedro Rodriguez', 'Calle 45, Barranquilla', '345-678-9012', '2021-03-10'),
+(13, 'Ana Martinez', 'Avenida cincumbalar, Bogota', '456-789-0123', '2022-01-01'),
+(14, 'Luisa Hernandez', 'Calle 3, Bogota', '567-890-1234', '2018-09-20'),
+(15, 'Alan Garcia', 'Calle falsa 123, Bogota', '678-901-2345', '2020-01-01'),
+(16, 'Maria Restrepo', 'Carrera 50, Medellin', '789-012-3456', '2021-05-15'),
+(17, 'Adrian Gomez', 'Calle 12, Barranquilla', '890-123-4567', '2022-06-10'),
+(18, 'Luis Martinez', 'Avenida Boyacá, Bogota', '901-234-5678', '2020-11-01'),
+(19, 'Jessica Rodriguez', 'Calle 67, Bogota', '321-456-7890', '2019-10-20');
+
+
+
+
+INSERT INTO Yates VALUES
+('ABC123', 'Aurora', 'Motor', '10 x 5'),
+('DEF456', 'Atlantis', 'Vela', '8 x 4'),
+('GHI789', 'Eclipse', 'Motor', '12 x 6'),
+('JKL012', 'Galaxy', 'Motor', '15 x 8'),
+('MNO345', 'Oasis', 'Vela', '10 x 5'),
+('qwe123', 'Alan', 'Motor', '10 x 5'),
+('asd456', 'MAria', 'Vela', '8 x 4'),
+('zxc789', 'Luna', 'Motor', '12 x 6'),
+('rty012', 'Androyd', 'Motor', '15 x 8'),
+('fgh345', 'Desier', 'Vela', '10 x 5');
+
+INSERT INTO Zonas VALUES
+('A', 8.5, 15),
+('B', 10.0, 20),
+('C', 7.5, 12),
+('D', 9.0, 18),
+('E', 8.0, 10),
+('F', 10.01, 16),
+('G', 11.0, 22),
+('H', 9.05, 20),
+('I', 12.0, 25),
+('J', 7.8, 15);
+
+INSERT INTO Amarres VALUES
+(1, 100, 50, '2021-02-01', '2021-01-01', '2021-03-01', 'ABC123', 10,'A'),
+(2, 75, 40, '2021-02-01', '2020-12-01', '2021-02-01', 'DEF456', 11,'B'),
+(3, 90, 45, '2021-02-01', '2020-11-01', '2021-01-01', 'GHI789', 12,'C'),
+(4, 110, 60, '2021-02-01', '2021-01-01', '2021-03-01', 'JKL012', 13,'D'),
+(5, 85, 50, '2021-02-01', '2021-01-01', '2021-02-01', 'MNO345', 14, 'E'),
+(6, 110, 40, '2022-04-11', '2021-01-01', '2024-03-01', 'qwe123', 10, 'A'),
+(7, 74, 46, '2023-06-21', '2020-12-01', '2024-02-01', 'asd456', 11, 'B'),
+(8, 95, 43, '2022-05-25', '2020-11-01', '2024-01-01', 'zxc789', 12, 'C'),
+(9, 130, 20, '2023-08-12', '2021-01-01', '2024-03-01', 'rty012', 13, 'D'),
+(10, 55, 90, '2022-10-26', '2021-01-01', '2024-02-01', 'fgh345', 14, 'E');
+
+INSERT INTO Yates_Zonas VALUES
+('ABC123', 'A'),
+('DEF456', 'B'),
+('GHI789', 'C'),
+('JKL012', 'D'),
+('MNO345', 'E'),
+('qwe123', 'A'),
+('asd456', 'B'),
+('zxc789', 'C'),
+('rty012', 'D'),
+('fgh345', 'E');
+
+
+INSERT INTO Empleados VALUES
+(20, 'Carlos Torres', '2020-05-01'),
+(21, 'Julia Gomez', '2019-08-15'),
+(23, 'Mario Pardo', '2021-01-10'),
+(24, 'Ana Chavez', '2022-02-28'),
+(25, 'Sofia Rodriguez', '2018-06-20'),
+(26, 'Juan Perez', '2020-05-01'),
+(27, 'Juliana Maldonado', '2020-10-15'),
+(28, 'Fransisco Gomez', '2022-01-10'),
+(29, 'Camilo Mora', '2021-12-28'),
+(30, 'Carolina Agudelo', '2019-06-20');
+
+INSERT INTO Yates_Empleados VALUES
+('ABC123', 20),
+('DEF456', 21),
+('GHI789', 23),
+('JKL012', 24),
+('MNO345', 25),
+('qwe123', 26),
+('asd456', 27),
+('zxc789', 27),
+('rty012', 28),
+('fgh345', 30);
+
+INSERT INTO Socios_Amarres VALUES
+(10, 1, '2022-02-01'),
+(11, 2, '2022-03-10'),
+(12, 3, '2022-01-03'),
+(13, 4, '2022-01-04'),
+(14, 5, '2022-01-05'),
+(15, 6, '2021-01-01'),
+(16, 7, '2020-12-01'),
+(17, 8, '2020-11-01'),
+(18, 9, '2021-01-01'),
+(19, 10, '2021-01-01');
+
+INSERT INTO Facturas VALUES
+(1, '2022-01-01', 500.00, 10, 'Pendiente'),
+(2, '2022-01-01', 350.00, 11, 'Pagado'),
+(3, '2022-02-01', 400.00, 12, 'Pendiente'),
+(4, '2022-02-01', 550.00, 13, 'Pagado'),
+(5, '2022-03-01', 450.00, 14, 'Pendiente'),
+(6, '2023-03-01', 600.00, 10, 'Pendiente'),
+(7, '2023-03-01', 950.00, 11, 'Pagado'),
+(8, '2023-03-01', 700.00, 12, 'Pendiente'),
+(9, '2023-03-01', 350.00, 13, 'Pagado'),
+(10, '2022-03-01', 350.00, 14, 'Pendiente');
+
+
+#consultas
+#Mostrar los socios y los yates que tienen asignados, junto con la fecha en que el yate fue asignado a un amarre:
+
+SELECT Socios.nombre AS nombre_socio , Amarres.fecha_asignacion, Yates.nombre AS nombre_Yate
+FROM Socios
+JOIN Amarres ON Socios.cedula = Amarres.cedula_socio_propietario
+JOIN Yates ON Amarres.matricula_yate = Yates.matricula;
+
+#Mostrar los detalles de los amarres, incluyendo la fecha de compra o arriendo, la fecha de asignación del yate y los detalles de la zona:
+
+SELECT Amarres.numero_amarre, Amarres.fecha_compra, Amarres.fecha_asignacion, Zonas.letra_zona AS nombre_zona, Zonas.ancho AS detalle_ancho_zona, Zonas.profundidad AS detalle_profundidad_zona
+FROM Amarres
+JOIN Zonas ON Amarres.letra_zona = Zonas.letra_zona;
+
+#Mostrar los yates que un empleado tiene a su cargo:
+
+SELECT Empleados.nombre AS nombre_empleado, Yates.nombre AS nombre_yate, Yates.matricula, Yates.tipo, Yates.dimensiones
+FROM Empleados
+JOIN Yates_Empleados ON Empleados.cedula_empleado = Yates_Empleados.cedula_empleado
+JOIN Yates ON Yates_Empleados.matricula_yate = Yates.matricula
+WHERE Empleados.nombre = 'Juliana Maldonado';
+
+#Mostrar la lista de yates de un socio, junto con la fecha de asignación o compra, y en qué amarre se encuentra cada yate:
+
+SELECT Socios.nombre, Amarres.fecha_compra, Amarres.fecha_asignacion, Yates.nombre, Amarres.numero_amarre
+FROM Socios
+JOIN Socios_Amarres ON Socios.cedula = Socios_Amarres.cedula_socio
+JOIN Amarres ON Socios_Amarres.numero_amarre = Amarres.numero_amarre
+JOIN Yates ON Amarres.matricula_yate = Yates.matricula
+WHERE Socios.nombre = 'Juan Perez';
+
+#Mostrar los amarres que un socio es dueño:
+
+SELECT Socios.nombre As nombre_socio, Amarres.numero_amarre, Amarres.fecha_compra, Amarres.fecha_asignacion, Yates.nombre As nombre_Yate
+FROM Socios
+JOIN Amarres ON Socios.cedula = Amarres.cedula_socio_propietario
+JOIN Yates ON Amarres.matricula_yate = Yates.matricula
+WHERE Socios.nombre = 'Juan Perez';
+
+#Se debe tener en cuenta que por concepto de arriendo se debe pagar una cuota mensual y es importante saber quiénes están al día o quienes deben de acuerdo a la factura del mes:
+
+SELECT Facturas.cedula_socio, Socios.nombre, Facturas.mes, Facturas.monto, Facturas.estado_pago
+FROM Facturas
+JOIN Socios ON Facturas.cedula_socio = Socios.cedula
+WHERE Facturas.mes = '2023-03-01'
+AND Facturas.estado_pago = 'pendiente';
